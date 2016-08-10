@@ -1,0 +1,12 @@
+/.project
+/BatchInformation.class
+/BulkLoader.class
+/ConnectionInformation.class
+/ConnectionPartner.class
+/CreateBulkLoadJobs.class
+/XLSX2CSV$MyXSSFSheetHandler.class
+/XLSX2CSV$xssfDataType.class
+/XLSX2CSV.class
+/XLSXTOCSV$SheetToCSV.class
+/XLSXTOCSV.class
+/xls2xlsx.class
