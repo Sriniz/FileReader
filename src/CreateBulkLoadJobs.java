@@ -105,10 +105,11 @@ public class CreateBulkLoadJobs {
 	   *  
 	   */
 	  public BatchInformation createBatchesFromCSVFile(PartnerConnection partConn, RestConnection connection,
-	      JobInfo jobInfo, String parentId) throws IOException,ConnectionException,
+	      JobInfo jobInfo, String parentId, Boolean isSuccess) throws IOException,ConnectionException,
 	      AsyncApiException, InvalidFormatException {
 	    List<BatchInfo> batchInfos = new ArrayList<BatchInfo>();
 	    String aId = "";
+	    Boolean isSuccessful = false;
 	    //input file
 	    QueryResult queryResultsAttach = partConn.query("SELECT Id,Body,Name,ParentId FROM Attachment where ParentId='"+parentId+"'");
 	    		// AND Name like '%.csv'");
@@ -168,13 +169,15 @@ public class CreateBulkLoadJobs {
 		      if (currentLines > 1) {
 		        createBatch(tmpOut, tmpFile, batchInfos, connection, jobInfo);
 		      }
+		      isSuccessful = true;
 	    } catch (Exception e) {
 	    	System.out.println("Something went wrong...");
+	    	isSuccessful = false;
 			e.printStackTrace();
 		} finally {
 	      tmpFile.delete();
 	    }
-	    return new BatchInformation(batchInfos,aId);
+	    return new BatchInformation(batchInfos,aId,isSuccessful);
 	  }
 
 	  

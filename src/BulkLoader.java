@@ -126,9 +126,10 @@
 	        //Initiate CA upload records
 	        blkjobs = new CreateBulkLoadJobs();
 	        job = blkjobs.createJob(sobjectType, connection);
-	        BatchInformation btch = blkjobs.createBatchesFromCSVFile(partConn, connection, job, Ids);
+	        BatchInformation btch = blkjobs.createBatchesFromCSVFile(partConn, connection, job, Ids, false);
 	        List<BatchInfo> batchInfoList = btch.batchInfoList;
 	        String atchId = btch.attachmentId;
+	        Boolean isSuccesful = btch.isSuccessful;
 	        blkjobs.closeJob(connection, job.getId());
 	        blkjobs.awaitCompletion(connection, job, batchInfoList);
 	        isSuccessfulUpload = blkjobs.checkResults(connection, job, batchInfoList);
@@ -140,7 +141,7 @@
 		    File tmpFile1 = File.createTempFile("bulkAPIUpdateParent", ".csv");
 		    FileOutputStream tmpOutParent = new FileOutputStream(tmpFile1);
 		    List<BatchInfo> batch1 = new ArrayList<BatchInfo>();
-		    if(isSuccessfulUpload){
+		    if(isSuccesful && isSuccessfulUpload){
 		    	tmpOutParent.write("Id,Upload_Status__c\n".getBytes("UTF-8"));
 		    	tmpOutParent.write((Ids+",Waiting To Process\n").getBytes("UTF-8"));
 		    } else {

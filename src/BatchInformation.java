@@ -6,10 +6,12 @@ public class BatchInformation {
 
 		List<BatchInfo> batchInfoList;
 	    String attachmentId;
+	    Boolean isSuccessful;
 
-	    public BatchInformation(List<BatchInfo> batchInfoList, String attachmentId) {
+	    public BatchInformation(List<BatchInfo> batchInfoList, String attachmentId, Boolean isSuccessful) {
 	        this.batchInfoList = batchInfoList;
 	        this.attachmentId = attachmentId;
+	        this.isSuccessful = isSuccessful;
 	    }
 
 }

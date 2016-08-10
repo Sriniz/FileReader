@@ -19,7 +19,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * Partial copy of one of style and data..
- * 
+ *  
  * @author jcalfee
  */
 public class xls2xlsx {
