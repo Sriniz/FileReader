@@ -1,6 +1,13 @@
+/**
+ * @author Srinizkumar Konakanchi
+ *
+ */
+
+package com.xlsxReadWrite;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException; 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -36,39 +43,29 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-
-
 /**
- * A rudimentary XLSX -> CSV processor modeled on the
- * POI sample program XLS2CSVmra by Nick Burch from the
- * package org.apache.poi.hssf.eventusermodel.examples.
- * Unlike the HSSF version, this one completely ignores 
- * missing rows.
+ * A rudimentary XLSX -> CSV processor modeled on the POI sample program
+ * XLS2CSVmra by Nick Burch from the package
+ * org.apache.poi.hssf.eventusermodel.examples. Unlike the HSSF version, this
+ * one completely ignores missing rows.
  * 
- * Data sheets are read using a SAX parser to keep the 
- * memory footprint relatively small, so this should be
- * able to read enormous workbooks.  The styles table and
- * the shared-string table must be kept in memory.  The
- * standard POI styles table class is used, but a custom
- * (read-only) class is used for the shared string table
- * because the standard POI SharedStringsTable grows very
- * quickly with the number of unique strings.
+ * Data sheets are read using a SAX parser to keep the memory footprint
+ * relatively small, so this should be able to read enormous workbooks. The
+ * styles table and the shared-string table must be kept in memory. The standard
+ * POI styles table class is used, but a custom (read-only) class is used for
+ * the shared string table because the standard POI SharedStringsTable grows
+ * very quickly with the number of unique strings.
  * 
  * @author Chris Lott
  */
 public class XLSX2CSV {
 
 	/**
-	 * The type of the data value is indicated by an attribute on 
-	 * the cell element; the value is in a "v" element within the cell.
+	 * The type of the data value is indicated by an attribute on the cell
+	 * element; the value is in a "v" element within the cell.
 	 */
 	enum xssfDataType {
-		BOOL,
-		ERROR,
-		FORMULA,
-		INLINESTR,
-		SSTINDEX,
-		NUMBER,
+		BOOL, ERROR, FORMULA, INLINESTR, SSTINDEX, NUMBER,
 	}
 
 	/**
@@ -116,15 +113,16 @@ public class XLSX2CSV {
 		/**
 		 * Accepts objects needed while parsing.
 		 * 
-		 * @param styles Table of styles
-		 * @param strings Table of shared strings
-		 * @param cols Minimum number of columns to show
-		 * @param target Sink for output
+		 * @param styles
+		 *            Table of styles
+		 * @param strings
+		 *            Table of shared strings
+		 * @param cols
+		 *            Minimum number of columns to show
+		 * @param target
+		 *            Sink for output
 		 */
-		public MyXSSFSheetHandler(
-				StylesTable styles,
-				ReadOnlySharedStringsTable strings,
-				int cols,
+		public MyXSSFSheetHandler(StylesTable styles, ReadOnlySharedStringsTable strings, int cols,
 				PrintStream target) {
 			this.stylesTable = styles;
 			this.sharedStringsTable = strings;
@@ -137,14 +135,15 @@ public class XLSX2CSV {
 
 		/*
 		 * (non-Javadoc)
-		 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String,
-java.lang.String, org.xml.sax.Attributes)
+		 * 
+		 * @see
+		 * org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
+		 * java.lang.String, java.lang.String, org.xml.sax.Attributes)
 		 */
-		public void startElement(String uri, String localName, String name,
-				Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
 
 			if ("inlineStr".equals(name) || "v".equals(name)) {
-				vIsOpen = true; 
+				vIsOpen = true;
 				// Clear contents cache
 				value.setLength(0);
 			}
@@ -179,10 +178,11 @@ java.lang.String, org.xml.sax.Attributes)
 					nextDataType = xssfDataType.FORMULA;
 				else if (cellStyleStr != null) {
 					/*
-					 * It's a number, but possibly has a style and/or special format.
-					 * Nick Burch said to use org.apache.poi.ss.usermodel.BuiltinFormats, 
-					 * and I see javadoc for that at apache.org, but it's not in the
-					 * POI 3.5 Beta 5 jars.  Scheduled to appear in 3.5 beta 6.
+					 * It's a number, but possibly has a style and/or special
+					 * format. Nick Burch said to use
+					 * org.apache.poi.ss.usermodel.BuiltinFormats, and I see
+					 * javadoc for that at apache.org, but it's not in the POI
+					 * 3.5 Beta 5 jars. Scheduled to appear in 3.5 beta 6.
 					 */
 					int styleIndex = Integer.parseInt(cellStyleStr);
 					XSSFCellStyle style = stylesTable.getStyleAt(styleIndex);
@@ -197,11 +197,11 @@ java.lang.String, org.xml.sax.Attributes)
 
 		/*
 		 * (non-Javadoc)
-		 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String,
-java.lang.String)
+		 * 
+		 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
+		 * java.lang.String, java.lang.String)
 		 */
-		public void endElement(String uri, String localName, String name)
-		throws SAXException {
+		public void endElement(String uri, String localName, String name) throws SAXException {
 
 			String thisStr = null;
 
@@ -209,7 +209,7 @@ java.lang.String)
 			if ("v".equals(name)) {
 				// Process the value contents as required.
 				// Do now, as characters() may be called more than once
-				switch(nextDataType) {
+				switch (nextDataType) {
 
 				case BOOL:
 					char first = value.charAt(0);
@@ -218,9 +218,9 @@ java.lang.String)
 
 				case ERROR:
 					thisStr = "\"ERROR:" + value.toString() + '"';
-					break;	
+					break;
 
-				case FORMULA: 
+				case FORMULA:
 					// A formula could result in a string value,
 					// so always add double-quote characters.
 					thisStr = '"' + value.toString() + '"';
@@ -229,7 +229,7 @@ java.lang.String)
 				case INLINESTR:
 					// TODO: have seen an example of this, so it's untested.
 					XSSFRichTextString rtsi = new XSSFRichTextString(value.toString());
-					thisStr = '"' + rtsi.toString() + '"'; 
+					thisStr = '"' + rtsi.toString() + '"';
 					break;
 
 				case SSTINDEX:
@@ -237,9 +237,8 @@ java.lang.String)
 					try {
 						int idx = Integer.parseInt(sstIndex);
 						XSSFRichTextString rtss = new XSSFRichTextString(sharedStringsTable.getEntryAt(idx));
-						thisStr = '"' + rtss.toString() + '"'; 
-					}
-					catch (NumberFormatException ex) {
+						thisStr = '"' + rtss.toString() + '"';
+					} catch (NumberFormatException ex) {
 						output.println("Failed to parse SST index '" + sstIndex + "': " + ex.toString());
 					}
 					break;
@@ -248,42 +247,46 @@ java.lang.String)
 					String n = value.toString();
 
 					if (this.formatString != null)
-						if(DateUtil.isADateFormat(this.formatIndex,this.formatString)){
+						if (DateUtil.isADateFormat(this.formatIndex, this.formatString)) {
 							Date date = DateUtil.getJavaDate(Double.parseDouble(n));
 							String df = DateUtils.createDateFormat().format(date);
-							thisStr = df.substring(0,10);
+							thisStr = df.substring(0, 10);
 						} else
-							thisStr = formatter.formatRawCellContents(Double.parseDouble(n), this.formatIndex, this.formatString);
+							thisStr = formatter.formatRawCellContents(Double.parseDouble(n), this.formatIndex,
+									this.formatString);
 					else
 						thisStr = n;
 					break;
 
 				default:
 					thisStr = "(TODO: Unexpected type: " + nextDataType + ")";
-				break;
+					break;
 				}
 
 				// Output after we've seen the string contents
 				// Emit commas for any fields that were missing on this row
-				if(lastColumnNumber == -1) { lastColumnNumber = 0; }
+				if (lastColumnNumber == -1) {
+					lastColumnNumber = 0;
+				}
 				for (int i = lastColumnNumber; i < thisColumn; ++i)
 					output.print(',');
 
 				// Might be the empty string.
 				output.print(thisStr);
 
-				// Update column 
-				if(thisColumn > -1)
+				// Update column
+				if (thisColumn > -1)
 					lastColumnNumber = thisColumn;
 
-			}
-			else if("row".equals(name)) {
+			} else if ("row".equals(name)) {
 
 				// Print out any missing commas if needed
-				if(minColumns > 0) {
+				if (minColumns > 0) {
 					// Columns are 0 based
-					if(lastColumnNumber == -1) { lastColumnNumber = 0; }
-					for(int i=lastColumnNumber; i<(this.minColumnCount); i++) {
+					if (lastColumnNumber == -1) {
+						lastColumnNumber = 0;
+					}
+					for (int i = lastColumnNumber; i < (this.minColumnCount); i++) {
 						output.print(',');
 					}
 				}
@@ -296,17 +299,17 @@ java.lang.String)
 		}
 
 		/**
-		 * Captures characters only if a suitable element is open.
-		 * Originally was just "v"; extended for inlineStr also.
+		 * Captures characters only if a suitable element is open. Originally
+		 * was just "v"; extended for inlineStr also.
 		 */
-		public void characters(char[] ch, int start, int length)
-		throws SAXException {
+		public void characters(char[] ch, int start, int length) throws SAXException {
 			if (vIsOpen)
 				value.append(ch, start, length);
 		}
 
 		/**
 		 * Converts an Excel column name like "C" to a zero-based index.
+		 * 
 		 * @param name
 		 * @return Index corresponding to the specified name
 		 */
@@ -328,13 +331,16 @@ java.lang.String)
 	private PrintStream output;
 
 	/**
-	 * Creates a new XLSX -> CSV converter
-	 * Javadoc says I should use OPCPackage instead of Package, but OPCPackage 
-	 * was not available in the POI 3.5-beta5 build I used.
+	 * Creates a new XLSX -> CSV converter Javadoc says I should use OPCPackage
+	 * instead of Package, but OPCPackage was not available in the POI 3.5-beta5
+	 * build I used.
 	 * 
-	 * @param pkg The XLSX package to process
-	 * @param output The PrintStream to output the CSV to
-	 * @param minColumns The minimum number of columns to output, or -1 for no minimum
+	 * @param pkg
+	 *            The XLSX package to process
+	 * @param output
+	 *            The PrintStream to output the CSV to
+	 * @param minColumns
+	 *            The minimum number of columns to output, or -1 for no minimum
 	 */
 	public XLSX2CSV(OPCPackage pkg, PrintStream output, int minColumns) {
 		this.xlsxPackage = pkg;
@@ -347,17 +353,15 @@ java.lang.String)
 	}
 
 	/**
-	 * Parses and shows the content of one sheet
-	 * using the specified styles and shared-strings tables.
+	 * Parses and shows the content of one sheet using the specified styles and
+	 * shared-strings tables.
+	 * 
 	 * @param styles
 	 * @param strings
 	 * @param sheetInputStream
 	 */
-	public void processSheet(
-			StylesTable styles,
-			ReadOnlySharedStringsTable strings, 
-			InputStream sheetInputStream) 
-	throws IOException, ParserConfigurationException, SAXException {
+	public void processSheet(StylesTable styles, ReadOnlySharedStringsTable strings, InputStream sheetInputStream)
+			throws IOException, ParserConfigurationException, SAXException {
 
 		InputSource sheetSource = new InputSource(sheetInputStream);
 		SAXParserFactory saxFactory = SAXParserFactory.newInstance();
@@ -370,18 +374,18 @@ java.lang.String)
 
 	/**
 	 * Initiates the processing of the XLS workbook file to CSV.
+	 * 
 	 * @throws IOException
 	 * @throws OpenXML4JException
 	 * @throws ParserConfigurationException
-	 * @throws SAXException 
+	 * @throws SAXException
 	 */
-	public void process() 
-	throws IOException, OpenXML4JException, ParserConfigurationException, SAXException {
+	public void process() throws IOException, OpenXML4JException, ParserConfigurationException, SAXException {
 
 		ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(this.xlsxPackage);
 		XSSFReader xssfReader = new XSSFReader(this.xlsxPackage);
-		StylesTable styles = xssfReader.getStylesTable(); 
-		XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator)xssfReader.getSheetsData();
+		StylesTable styles = xssfReader.getStylesTable();
+		XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
 		int index = 0;
 		while (index == 0) {
 			InputStream stream = iter.next();
@@ -389,25 +393,29 @@ java.lang.String)
 			processSheet(styles, strings, stream);
 			stream.close();
 			++index;
-		}		
+		}
 	}
 
-    public String xlsx2csvConverter(File xlsxFile)  throws Exception {
+	public String xlsx2csvConverter(File xlsxFile) throws Exception {
 
 		// If no log4j configuration is provided, these messages appear:
-		//   log4j:WARN No appenders could be found for logger (org.openxml4j.opc).
-		//   log4j:WARN Please initialize the log4j system properly.
-		// If only the BasicConfigurator.configure() is done, these messages appear:
-		//   0 [main] DEBUG org.openxml4j.opc  - Parsing relationship: /xl/_rels/workbook.xml.rels
-		//  46 [main] DEBUG org.openxml4j.opc  - Parsing relationship: /_rels/.rels
+		// log4j:WARN No appenders could be found for logger
+		// (org.openxml4j.opc).
+		// log4j:WARN Please initialize the log4j system properly.
+		// If only the BasicConfigurator.configure() is done, these messages
+		// appear:
+		// 0 [main] DEBUG org.openxml4j.opc - Parsing relationship:
+		// /xl/_rels/workbook.xml.rels
+		// 46 [main] DEBUG org.openxml4j.opc - Parsing relationship:
+		// /_rels/.rels
 		// Added the call to setLevel() to turn these off, now I see nothing.
 
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.INFO);
 
-        int minColumns = -1;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
+		int minColumns = -1;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(baos);
 		// The package open is instantaneous, as it should be.
 		OPCPackage p = OPCPackage.open(xlsxFile.getPath(), PackageAccess.READ);
 		XLSX2CSV xlsx2csv = new XLSX2CSV(p, ps, minColumns);
@@ -417,7 +425,7 @@ java.lang.String)
 		p.close();
 		String content = new String(baos.toByteArray(), StandardCharsets.UTF_8);
 		System.out.println("Yaayy Sriniz!!! Conversion is done..");
-        return content;
+		return content;
 	}
 
 }
