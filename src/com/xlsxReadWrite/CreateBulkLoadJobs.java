@@ -145,7 +145,7 @@ public class CreateBulkLoadJobs {
 		try {
 			int maxRowsPerBatch = 1000; // 10 thousand rows per batch
 			int currentLines = 0;
-			String csvString = x.xlsx2csvConverter(f1);
+			String csvString = x.xlsx2csvConverter(f1, headerString.split(",").length - 2);
 
 			csvString = csvString.replace("\n", "," + parentId + "\n");
 			csvString = headerString + csvString;

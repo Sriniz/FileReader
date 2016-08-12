@@ -396,7 +396,7 @@ public class XLSX2CSV {
 		}
 	}
 
-	public String xlsx2csvConverter(File xlsxFile) throws Exception {
+	public String xlsx2csvConverter(File xlsxFile, int noOfCols) throws Exception {
 
 		// If no log4j configuration is provided, these messages appear:
 		// log4j:WARN No appenders could be found for logger
@@ -413,7 +413,7 @@ public class XLSX2CSV {
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.INFO);
 
-		int minColumns = -1;
+		int minColumns = noOfCols;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
 		// The package open is instantaneous, as it should be.

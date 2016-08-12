@@ -10,6 +10,8 @@ import java.util.*;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -104,12 +106,6 @@ public class BulkLoader {
 				Ids = (String) queryResults.getRecords()[i].getField("Id");
 				System.out.println("Processing Batch Id - " + Ids);
 
-				// QueryResult queryResultsAttach = partConn.query("SELECT
-				// Id,Body,Name,ParentId FROM Attachment where
-				// ParentId='"+Ids+"' AND Name like '%.csv'");
-				// String csvFile =
-				// (String)queryResultsAttach.getRecords()[0].getField("Body");
-
 				// Initiate CA upload records
 				blkjobs = new CreateBulkLoadJobs();
 				job = blkjobs.createJob(sobjectType, connection);
@@ -120,45 +116,25 @@ public class BulkLoader {
 				blkjobs.closeJob(connection, job.getId());
 				blkjobs.awaitCompletion(connection, job, batchInfoList);
 				isSuccessfulUpload = blkjobs.checkResults(connection, job, batchInfoList);
-				// System.out.println("File upload has been completed...");
 
-				// Update the Staus of parent record to 'Waiting To Process'
-				CreateBulkLoadJobs blkjobsParent = new CreateBulkLoadJobs();
-				JobInfo job1 = blkjobsParent.createUpdateJob(sObjectTypeParent, connection);
-				File tmpFile1 = File.createTempFile("bulkAPIUpdateParent", ".csv");
-				FileOutputStream tmpOutParent = new FileOutputStream(tmpFile1);
-				List<BatchInfo> batch1 = new ArrayList<BatchInfo>();
-				if (isSuccesful && isSuccessfulUpload) {
-					tmpOutParent.write("Id,Upload_Status__c\n".getBytes("UTF-8"));
-					tmpOutParent.write((Ids + ",Waiting To Process\n").getBytes("UTF-8"));
-					System.out.println(
-							"Upload completed...Status of upload request has been updated Waiting To Process : " + Ids);
-				} else {
-					tmpOutParent.write("Id,Upload_Status__c\n".getBytes("UTF-8"));
-					tmpOutParent.write((Ids + ",Failed\n").getBytes("UTF-8"));
-					System.out.println("Upload completed...Status of upload request has been updated Failed : " + Ids);
-				}
-				blkjobsParent.createBatch(tmpOutParent, tmpFile1, batch1, connection, job1);
-				tmpFile1.deleteOnExit();
-				blkjobsParent.closeJob(connection, job1.getId());
-				blkjobsParent.awaitCompletion(connection, job1, batch1);
-				blkjobsParent.checkResults(connection, job1, batch1);
+				// Update the Status of parent record to 'Waiting To Process' or
+				// 'Failed'
+				if (isSuccesful && isSuccessfulUpload)
+					updateCAUpload(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27),
+							Ids, "wp");
+				else
+					updateCAUpload(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27),
+							Ids, "f");
+
 			} catch (Exception e) {
-				// Update the Staus of parent record to 'Waiting To Process'
-				blkjobs.closeJob(connection, job.getId());
-				CreateBulkLoadJobs blkjobsParent = new CreateBulkLoadJobs();
-				JobInfo job1 = blkjobsParent.createUpdateJob(sObjectTypeParent, connection);
-				File tmpFile1 = File.createTempFile("bulkAPIUpdateParent", ".csv");
-				FileOutputStream tmpOutParent = new FileOutputStream(tmpFile1);
-				List<BatchInfo> batch1 = new ArrayList<BatchInfo>();
-				tmpOutParent.write("Id,Upload_Status__c\n".getBytes("UTF-8"));
-				tmpOutParent.write((Ids + ",Failed\n").getBytes("UTF-8"));
-				blkjobsParent.createBatch(tmpOutParent, tmpFile1, batch1, connection, job1);
-				tmpFile1.delete();
-				blkjobsParent.closeJob(connection, job1.getId());
-				blkjobsParent.awaitCompletion(connection, job1, batch1);
-				blkjobsParent.checkResults(connection, job1, batch1);
-				System.out.println("Status of upload request has been updated to Failed : " + Ids);
+				try {
+					updateCAUpload(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27),
+							Ids, "f");
+					System.out.println("Status of upload request has been updated to Failed : " + Ids);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 
 		}
@@ -174,21 +150,38 @@ public class BulkLoader {
 			CreateXLSXFile cx = new CreateXLSXFile();
 			cx.createFile(partConn, connection, partnerConfig, Ids);
 
-			CreateBulkLoadJobs blkjobsParent = new CreateBulkLoadJobs();
-			JobInfo job1 = blkjobsParent.createUpdateJob(sObjectTypeParent, connection);
-			File tmpFile1 = File.createTempFile("bulkAPIUpdateParentFinal", ".csv");
-			FileOutputStream tmpOutParentFinal = new FileOutputStream(tmpFile1);
-			List<BatchInfo> batch1 = new ArrayList<BatchInfo>();
-			tmpOutParentFinal.write("Id,Upload_Status__c\n".getBytes("UTF-8"));
-			tmpOutParentFinal.write((Ids + ",Completed\n").getBytes("UTF-8"));
-			blkjobsParent.createBatch(tmpOutParentFinal, tmpFile1, batch1, connection, job1);
-			tmpFile1.delete();
-			blkjobsParent.closeJob(connection, job1.getId());
-			blkjobsParent.awaitCompletion(connection, job1, batch1);
-			blkjobsParent.checkResults(connection, job1, batch1);
-			System.out.println("Error File has been prepared and status is set to Completed : " + Ids);
+			try {
+				updateCAUpload(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27), Ids,
+						"c");
+				System.out.println("Error File has been prepared and status is set to Completed : " + Ids);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		}
+	}
+
+	public void updateCAUpload(String sessionID, String instanceUrl, String uploadId, String type) throws Exception {
+		PostMethod post = new PostMethod(instanceUrl + "/services/data/v20.0/sobjects/CA_Upload__c/" + uploadId) {
+			@Override
+			public String getName() {
+				return "PATCH";
+			}
+		};
+		post.setRequestHeader("Authorization", "Bearer " + sessionID);
+		HttpClient httpclient = new HttpClient();
+		JSONObject caUpload = new JSONObject();
+		if (type == "c")
+			caUpload.put("Upload_Status__c", "Completed");
+		else if (type == "wp")
+			caUpload.put("Upload_Status__c", "Waiting To Process");
+		else if (type == "f")
+			caUpload.put("Upload_Status__c", "Failed");
+		post.setRequestEntity(new StringRequestEntity(caUpload.toString(), "application/json", "UTF-8"));
+		int sc = httpclient.executeMethod(post);
+		System.out.println("updateStatus " + sc);
+		return;
 	}
 
 }
