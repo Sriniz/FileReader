@@ -163,7 +163,7 @@ public class BulkLoader {
 	}
 
 	public void updateCAUpload(String sessionID, String instanceUrl, String uploadId, String type) throws Exception {
-		PostMethod post = new PostMethod(instanceUrl + "/services/data/v20.0/sobjects/CA_Upload__c/" + uploadId) {
+		PostMethod post = new PostMethod(instanceUrl + "/services/data/v37.0/sobjects/CA_Upload__c/" + uploadId) {
 			@Override
 			public String getName() {
 				return "PATCH";

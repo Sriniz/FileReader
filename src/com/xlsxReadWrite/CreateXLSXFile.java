@@ -50,7 +50,7 @@ public class CreateXLSXFile extends createFileAbstract {
 			NameValuePair[] paramsQuery = new NameValuePair[1];
 			paramsQuery[0] = new NameValuePair("q",
 					"select id from Report where DeveloperName = 'CA_Upload_Records_report'");
-			String queryURL = partnerConfig.getServiceEndpoint().substring(0, 27) + "/services/data/v29.0/query";
+			String queryURL = partnerConfig.getServiceEndpoint().substring(0, 27) + "/services/data/v37.0/query";
 			GetMethod mygetQuery = new GetMethod(queryURL);
 			mygetQuery.setRequestHeader("Authorization", "Bearer " + partnerConfig.getSessionId());
 			mygetQuery.setRequestHeader("Sforce-Query-Options", "batchSize=2000");
@@ -97,7 +97,7 @@ public class CreateXLSXFile extends createFileAbstract {
 			}
 
 			// Reading First set of data
-			String reportURL = partnerConfig.getServiceEndpoint().substring(0, 27) + "/services/data/v29.0/query";
+			String reportURL = partnerConfig.getServiceEndpoint().substring(0, 27) + "/services/data/v37.0/query";
 			GetMethod myget = new GetMethod(reportURL);
 			myget.setRequestHeader("Authorization", "Bearer " + partnerConfig.getSessionId());
 			myget.setRequestHeader("Sforce-Query-Options", "batchSize=2000");
@@ -164,7 +164,7 @@ public class CreateXLSXFile extends createFileAbstract {
 	public JSONObject getReportDetails(String reportId, ConnectorConfig partnerConfig) throws Exception {
 		HttpClient httpclient = new HttpClient();
 		String reportURL = partnerConfig.getServiceEndpoint().substring(0, 27)
-				+ "/services/data/v29.0/analytics/reports/" + reportId + "/describe";
+				+ "/services/data/v37.0/analytics/reports/" + reportId + "/describe";
 		GetMethod myget = new GetMethod(reportURL);
 		myget.setRequestHeader("Authorization", "Bearer " + partnerConfig.getSessionId());
 		httpclient.executeMethod(myget);
