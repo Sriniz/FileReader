@@ -140,7 +140,7 @@ public class BulkLoader {
 		}
 
 		QueryResult queryResults1 = partConn
-				.query("SELECT Id FROM CA_Upload__c WHERE Upload_Status__c = 'Pending File Preparation'");
+				.query("SELECT Id FROM CA_Upload__c WHERE Upload_Status__c = 'Preparing File'");
 		System.out.println("File pending results size..." + queryResults1.getSize());
 
 		for (Integer i = 0; i < queryResults1.getSize(); i++) {
