@@ -22,7 +22,7 @@ public class Main {
 
 		// Salesforce.com credentials
 		String userName = "srinizkumar.konakanchi@wbconsultant.com.dv";
-		String password = "Indian06#BCHi3drXR87QU8ncVsUKJ7Scb";
+		String password = "";
 		String endPnt = "https://test.salesforce.com/services/Soap/u/17.0";
 
 		BulkLoader example = new BulkLoader();
