@@ -93,6 +93,7 @@ public class BulkLoader {
 		PartnerConnection partConn = connInfo.pConn;
 		RestConnection connection = connInfo.rConn;
 		ConnectorConfig partnerConfig = connInfo.partnerConfig;
+		String restEndPoint = partnerConfig.getServiceEndpoint().substring(0,partnerConfig.getServiceEndpoint().indexOf(".com")+4);
 
 		QueryResult queryResults = partConn
 				.query("SELECT Id FROM CA_Upload__c WHERE Upload_Status__c = 'Uploaded' ORDER BY CreatedDate ASC");
@@ -107,6 +108,7 @@ public class BulkLoader {
 				System.out.println("Processing Batch Id - " + Ids);
 
 				// Initiate CA upload records
+
 				blkjobs = new CreateBulkLoadJobs();
 				job = blkjobs.createJob(sobjectType, connection);
 				BatchInformation btch = blkjobs.createBatchesFromCSVFile(partConn, connection, job, Ids, false);
@@ -116,19 +118,19 @@ public class BulkLoader {
 				blkjobs.closeJob(connection, job.getId());
 				blkjobs.awaitCompletion(connection, job, batchInfoList);
 				isSuccessfulUpload = blkjobs.checkResults(connection, job, batchInfoList);
-
+				
 				// Update the Status of parent record to 'Waiting To Process' or
 				// 'Failed'
 				if (isSuccesful && isSuccessfulUpload)
-					updateCAUpload(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27),
+					updateCAUpload(partnerConfig.getSessionId(), restEndPoint,
 							Ids, "wp");
 				else
-					updateCAUpload(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27),
+					updateCAUpload(partnerConfig.getSessionId(), restEndPoint,
 							Ids, "f");
 
 			} catch (Exception e) {
 				try {
-					updateCAUpload(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27),
+					updateCAUpload(partnerConfig.getSessionId(), restEndPoint,
 							Ids, "f");
 					System.out.println("Status of upload request has been updated to Failed : " + Ids);
 				} catch (Exception e1) {
@@ -151,7 +153,7 @@ public class BulkLoader {
 			cx.createFile(partConn, connection, partnerConfig, Ids);
 
 			try {
-				updateCAUpload(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27), Ids,
+				updateCAUpload(partnerConfig.getSessionId(), restEndPoint, Ids,
 						"c");
 				System.out.println("Error File has been prepared and status is set to Completed : " + Ids);
 			} catch (Exception e) {

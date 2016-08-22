@@ -46,11 +46,12 @@ public class CreateXLSXFile extends createFileAbstract {
 			String uploadId) {
 
 		try {
+			String restEndPoint = partnerConfig.getServiceEndpoint().substring(0,partnerConfig.getServiceEndpoint().indexOf(".com")+4);
 			HttpClient httpclient = new HttpClient();
 			NameValuePair[] paramsQuery = new NameValuePair[1];
 			paramsQuery[0] = new NameValuePair("q",
 					"select id from Report where DeveloperName = 'CA_Upload_Records_report'");
-			String queryURL = partnerConfig.getServiceEndpoint().substring(0, 27) + "/services/data/v37.0/query";
+			String queryURL = restEndPoint + "/services/data/v37.0/query";
 			GetMethod mygetQuery = new GetMethod(queryURL);
 			mygetQuery.setRequestHeader("Authorization", "Bearer " + partnerConfig.getSessionId());
 			mygetQuery.setRequestHeader("Sforce-Query-Options", "batchSize=2000");
@@ -97,7 +98,7 @@ public class CreateXLSXFile extends createFileAbstract {
 			}
 
 			// Reading First set of data
-			String reportURL = partnerConfig.getServiceEndpoint().substring(0, 27) + "/services/data/v37.0/query";
+			String reportURL = restEndPoint + "/services/data/v37.0/query";
 			GetMethod myget = new GetMethod(reportURL);
 			myget.setRequestHeader("Authorization", "Bearer " + partnerConfig.getSessionId());
 			myget.setRequestHeader("Sforce-Query-Options", "batchSize=2000");
@@ -138,7 +139,7 @@ public class CreateXLSXFile extends createFileAbstract {
 				} catch (Exception e) {
 					nextRecordsUrl = null;
 				}
-				reportURL = partnerConfig.getServiceEndpoint().substring(0, 27) + nextRecordsUrl;
+				reportURL = restEndPoint + nextRecordsUrl;
 				System.out.println("reportURL " + reportURL);
 				myget = new GetMethod(reportURL);
 				myget.setRequestHeader("Authorization", "Bearer " + partnerConfig.getSessionId());
@@ -150,7 +151,7 @@ public class CreateXLSXFile extends createFileAbstract {
 			workBook.close();
 
 			System.out.println("I am done");
-			uploadAttachment(partnerConfig.getSessionId(), partnerConfig.getServiceEndpoint().substring(0, 27),
+			uploadAttachment(partnerConfig.getSessionId(), restEndPoint,
 					uploadId, xlsxFileName);
 
 		} catch (Exception e) {
@@ -163,7 +164,8 @@ public class CreateXLSXFile extends createFileAbstract {
 
 	public JSONObject getReportDetails(String reportId, ConnectorConfig partnerConfig) throws Exception {
 		HttpClient httpclient = new HttpClient();
-		String reportURL = partnerConfig.getServiceEndpoint().substring(0, 27)
+		String restEndPoint = partnerConfig.getServiceEndpoint().substring(0,partnerConfig.getServiceEndpoint().indexOf(".com")+4);
+		String reportURL = restEndPoint
 				+ "/services/data/v37.0/analytics/reports/" + reportId + "/describe";
 		GetMethod myget = new GetMethod(reportURL);
 		myget.setRequestHeader("Authorization", "Bearer " + partnerConfig.getSessionId());
