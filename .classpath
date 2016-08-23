@@ -22,9 +22,9 @@
 	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/poi-examples-3.15-beta2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/servlet-api.jar"/>
 	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/opencsv-2.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/partner-bulk-loader.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/wsc-17_0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/poi-ooxml-3.15-beta2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/MetaModel-core-4.5.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/Partner.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ctsuser1/Desktop/MARSEclipse/JARLIB/force-wsc-37.0-uber.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

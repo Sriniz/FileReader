@@ -12,10 +12,10 @@ import com.sforce.ws.ConnectorConfig;
 public class ConnectionInformation {
 
 	PartnerConnection pConn;
-	RestConnection rConn;
+	BulkConnection rConn;
 	ConnectorConfig partnerConfig;
 
-	public ConnectionInformation(PartnerConnection pConn, RestConnection rConn, ConnectorConfig partnerConfig) {
+	public ConnectionInformation(PartnerConnection pConn, BulkConnection rConn, ConnectorConfig partnerConfig) {
 		this.pConn = pConn;
 		this.rConn = rConn;
 		this.partnerConfig = partnerConfig;

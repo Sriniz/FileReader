@@ -33,7 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import com.sforce.async.RestConnection;
+import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.ws.ConnectorConfig;
@@ -42,7 +42,7 @@ public class CreateXLSXFile extends createFileAbstract {
 
 	LinkedHashMap<String, String> colToMap = new LinkedHashMap<String, String>();
 
-	public void createFile(PartnerConnection partConn, RestConnection restConn, ConnectorConfig partnerConfig,
+	public void createFile(PartnerConnection partConn, BulkConnection restConn, ConnectorConfig partnerConfig,
 			String uploadId) {
 
 		try {

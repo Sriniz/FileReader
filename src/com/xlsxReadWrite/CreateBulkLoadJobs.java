@@ -51,7 +51,7 @@ import com.sforce.async.ContentType;
 import com.sforce.async.JobInfo;
 import com.sforce.async.JobStateEnum;
 import com.sforce.async.OperationEnum;
-import com.sforce.async.RestConnection;
+import com.sforce.async.BulkConnection;
 
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
 import org.apache.poi.hssf.eventusermodel.HSSFRequest;
@@ -77,7 +77,7 @@ public class CreateBulkLoadJobs {
 	/**
 	 * Create a new job using the Bulk API.
 	 */
-	public JobInfo createJob(String sobjectType, RestConnection connection) throws AsyncApiException {
+	public JobInfo createJob(String sobjectType, BulkConnection connection) throws AsyncApiException {
 		JobInfo job = new JobInfo();
 		job.setObject(sobjectType);
 		job.setOperation(OperationEnum.insert);
@@ -91,7 +91,7 @@ public class CreateBulkLoadJobs {
 	/**
 	 * Create a new job using the Bulk API.
 	 */
-	public JobInfo createUpdateJob(String sobjectType, RestConnection connection) throws AsyncApiException {
+	public JobInfo createUpdateJob(String sobjectType, BulkConnection connection) throws AsyncApiException {
 		JobInfo job = new JobInfo();
 		job.setObject(sobjectType);
 		job.setOperation(OperationEnum.update);
@@ -106,16 +106,18 @@ public class CreateBulkLoadJobs {
 	 * size batch files.
 	 * 
 	 */
-	public BatchInformation createBatchesFromCSVFile(PartnerConnection partConn, RestConnection connection,
+	public BatchInformation createBatchesFromCSVFile(PartnerConnection partConn, BulkConnection connection,
 			JobInfo jobInfo, String parentId, Boolean isSuccess)
 					throws IOException, ConnectionException, AsyncApiException, InvalidFormatException {
 		List<BatchInfo> batchInfos = new ArrayList<BatchInfo>();
 		String aId = "";
 		Boolean isSuccessful = false;
 		// input file
+		System.out.println("Before query");
 		QueryResult queryResultsAttach = partConn
 				.query("SELECT Id,Body,Name,ParentId FROM Attachment where ParentId='" + parentId + "'");
 		// AND Name like '%.csv'");
+		System.out.println("after query..."+queryResultsAttach);
 		String xlsxFile = (String) queryResultsAttach.getRecords()[0].getField("Body");
 		File f1 = File.createTempFile("bulkAPIInsert_Attachment", ".xlsx");
 		f1.deleteOnExit();
@@ -190,7 +192,7 @@ public class CreateBulkLoadJobs {
 	 * output stream.
 	 */
 	public void createBatch(FileOutputStream tmpOut, File tmpFile, List<BatchInfo> batchInfos,
-			RestConnection connection, JobInfo jobInfo) throws IOException, AsyncApiException {
+			BulkConnection connection, JobInfo jobInfo) throws IOException, AsyncApiException {
 		tmpOut.flush();
 		tmpOut.close();
 		FileInputStream tmpInputStream = new FileInputStream(tmpFile);
@@ -207,7 +209,7 @@ public class CreateBulkLoadJobs {
 	/**
 	 * Closes the job
 	 */
-	public void closeJob(RestConnection connection, String jobId) throws AsyncApiException {
+	public void closeJob(BulkConnection connection, String jobId) throws AsyncApiException {
 		JobInfo job = new JobInfo();
 		job.setId(jobId);
 		job.setState(JobStateEnum.Closed);
@@ -217,7 +219,7 @@ public class CreateBulkLoadJobs {
 	/**
 	 * Wait for a job to complete by polling the Bulk API.
 	 */
-	public void awaitCompletion(RestConnection connection, JobInfo job, List<BatchInfo> batchInfoList)
+	public void awaitCompletion(BulkConnection connection, JobInfo job, List<BatchInfo> batchInfoList)
 			throws AsyncApiException {
 		long sleepTime = 0L;
 		Set<String> incomplete = new HashSet<String>();
@@ -248,7 +250,7 @@ public class CreateBulkLoadJobs {
 	/**
 	 * Gets the results of the operation and checks for errors.
 	 */
-	public Boolean checkResults(RestConnection connection, JobInfo job, List<BatchInfo> batchInfoList)
+	public Boolean checkResults(BulkConnection connection, JobInfo job, List<BatchInfo> batchInfoList)
 			throws AsyncApiException, IOException {
 		// batchInfoList was populated when batches were created and submitted
 		List<String> Ids = new ArrayList<String>();

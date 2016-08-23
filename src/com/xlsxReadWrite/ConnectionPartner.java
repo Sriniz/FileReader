@@ -20,7 +20,7 @@ import java.text.*;
 import com.sforce.ws.*;
 import com.sforce.soap.partner.*;
 import com.sforce.soap.partner.sobject.*;
-//import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.sobject.SObject;
@@ -57,7 +57,7 @@ public class ConnectionPartner {
 		// SOAP uri until the /Soap/ part. From here it's '/async/versionNumber'
 		String soapEndpoint = partnerConfig.getServiceEndpoint();
 		// System.out.println("soapEndpoint"+soapEndpoint);
-		String apiVersion = "17.0";
+		String apiVersion = "37.0";
 		String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + apiVersion;
 		config.setRestEndpoint(restEndpoint);
 		// System.out.println("restEndpoint.."+restEndpoint);
@@ -65,7 +65,7 @@ public class ConnectionPartner {
 		config.setCompression(true);
 		// Set this to true to see HTTP requests and responses on stdout
 		config.setTraceMessage(false);
-		RestConnection connection = new RestConnection(config);
+		BulkConnection connection = new BulkConnection(config);
 		return new ConnectionInformation(pConn, connection, partnerConfig);
 	}
 

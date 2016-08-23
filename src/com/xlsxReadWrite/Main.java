@@ -21,14 +21,9 @@ public class Main {
 	public static void main(String[] args) throws AsyncApiException, ConnectionException, IOException {
 
 		// Salesforce.com credentials
-<<<<<<< HEAD
-		String userName = "srinizkumar.konakanchi@wbconsultant.com.preprod";
+		String userName = "upload@test.com";
 		String password = "Indian06#";
-=======
-		String userName = "srinizkumar.konakanchi@wbconsultant.com.dv";
-		String password = "";
->>>>>>> origin/master
-		String endPnt = "https://test.salesforce.com/services/Soap/u/17.0";
+		String endPnt = "https://test.salesforce.com/services/Soap/u/37.0";
 
 		BulkLoader example = new BulkLoader();
 		example.run(userName, password, endPnt);

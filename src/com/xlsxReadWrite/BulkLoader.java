@@ -91,7 +91,7 @@ public class BulkLoader {
 		ConnectionPartner pc = new ConnectionPartner();
 		ConnectionInformation connInfo = pc.getRestConnection(userName, password, endPnt);
 		PartnerConnection partConn = connInfo.pConn;
-		RestConnection connection = connInfo.rConn;
+		BulkConnection connection = connInfo.rConn;
 		ConnectorConfig partnerConfig = connInfo.partnerConfig;
 		String restEndPoint = partnerConfig.getServiceEndpoint().substring(0,partnerConfig.getServiceEndpoint().indexOf(".com")+4);
 
